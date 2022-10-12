@@ -1,9 +1,23 @@
-var express = require('express');
-var router = express.Router();
+const express = require("express");
+const Router = express.Router();
+const passport = require("passport");
+Router.get(
+  "/auth/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
+Router.get(
+  "/auth/google/callback",
+  passport.authenticate("google", {
+    failureRedirect: "http://localhost:3000/login",
+  }),
+  function (req, res) {
+    // Successful authentication, redirect home.
+    console.log(req);
+    res.redirect(
+      `http://localhost:3000?email=${req.user.email}&fullname=${req.user.fullname}&secret=${req.user.secret}`
+    );
+  }
+);
 
-module.exports = router;
+module.exports = Router;
